@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="pioter" default="test">
+    <property file="./build.properties" />
+
+    <autoloader autoloaderpath="${project.basedir}/vendor/autoload.php"/>
+
+    <target name="setup" depends="setSvnRelative">
+        <gitclone repository="git://github.com/pioter/sub.git" targetPath="${project.basedir}/specific/Specific" />
+    </target>
+    <!--
+      =========================================================================
+       REPO UP
+      =========================================================================
+    -->
+    <target name="repo_up">
+        <svnupdate todir="${project.basedir}"/>
+        <svnupdate todir="${project.basedir}/specific/Specific"/>
+        <svnupdate todir="${project.basedir}/config/Config"/>
+        <svnupdate todir="${project.basedir}/public_html/specificStatic"/>
+        <if>
+            <equals arg1="${env}" arg2="localhost" />
+            <then>
+                <echo msg="Do not composer autoload" />
+            </then>
+            <else>
+                <echo msg="Do composer autoload" />
+                <composer command="dump-autoload">
+                    <arg value="-a"/>
+                    <arg value="--no-dev"/>
+                </composer>
+            </else>
+        </if>
+        <OpcacheReset/>
+        <phingcall target="gen"/>
+
+    </target>
+    <!--
+      =========================================================================
+       REPO SWITCH
+      =========================================================================
+    -->
+    <target name="repo_switch">
+        <input propertyname="site" defaultValue="no" promptChar="?">Site prefix</input>
+        <input propertyname="branche_ask" defaultValue="no" promptChar="?">Branche</input>
+        <svnswitch
+            nocache="true"
+            repositoryurl="svn://svn.provsys.net/core/branches/${branche_ask}"
+            todir="${project.basedir}"/>
+        <svnswitch
+            nocache="true"
+            repositoryurl="svn://svn.provsys.net/sites/${branche_ask}/${site}/Specific/"
+            todir="${project.basedir}/specific/Specific"/>
+        <svnswitch
+            nocache="true"
+            repositoryurl="svn://svn.provsys.net/sites/${branche_ask}/${site}/Config/"
+            todir="${project.basedir}/config/Config"/>
+        <svnswitch
+            nocache="true"
+            repositoryurl="svn://svn.provsys.net/sites/${branche_ask}/${site}/specificStatic"
+            todir="${project.basedir}/public_html/specificStatic"/>
+        <OpcacheReset/>
+    </target>
+</project>

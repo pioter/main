@@ -1,0 +1,13 @@
+{
+    "name": "vendor/name",
+    "authors": [
+        {
+            "name": "pioter",
+            "email": "pitreq@gmail.com"
+        }
+    ],
+    "require": {},
+    "require-dev": {
+        "phing/phing": "2.*"
+    }
+}
